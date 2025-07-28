@@ -26,7 +26,7 @@ public class AuthenticationController : ControllerBase
 
     [HttpGet]
     [Authorize]
-    public Teacher? Get()
+    public User? Get()
     {
         return _authenticationService.GetCurrentUser();
     }

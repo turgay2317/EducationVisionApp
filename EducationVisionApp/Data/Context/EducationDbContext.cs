@@ -4,11 +4,11 @@ namespace EducationVisionApp.Data.Context;
 
 public class EducationDbContext : DbContext
 {
-    public DbSet<Student> Students { get; set; }
-    public DbSet<Teacher> Teachers { get; set; }
+    public DbSet<User> Users { get; set; }
     public DbSet<Class> Classes { get; set; }
     public DbSet<Record> Records { get; set; }
-    public DbSet<StudentClassRecord> StudentClassRecords { get; set; }
+    public DbSet<UserClass> UserClasses { get; set; }
+    public DbSet<UserClassRecord> UserClassRecords { get; set; }
 
     public EducationDbContext(DbContextOptions<EducationDbContext> options) : base(options)
     {

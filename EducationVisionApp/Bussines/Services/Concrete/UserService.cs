@@ -7,46 +7,46 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EducationVisionApp.Bussines.Services;
 
-public class StudentService : IStudentService
+public class UserService : IUserService
 {
     private readonly EducationDbContext _context;
     private readonly IMapper _mapper;
 
-    public StudentService(EducationDbContext context, IMapper mapper)
+    public UserService(EducationDbContext context, IMapper mapper)
     {
         _context = context;
         _mapper = mapper;
     }
     
-    public async Task<StudentListDto> CreateAsync(StudentCreateUpdateDto dto)
+    public async Task<UserListDto> CreateAsync(UserCreateUpdateDto dto)
     {
-        var student = _mapper.Map<StudentCreateUpdateDto, Student>(dto);
+        var student = _mapper.Map<UserCreateUpdateDto, User>(dto);
         await _context.AddAsync(student);
         await _context.SaveChangesAsync();
-        return _mapper.Map<Student, StudentListDto>(student);
+        return _mapper.Map<User, UserListDto>(student);
     } 
     
-    public async Task<StudentListDto> GetAsync(long id)
+    public async Task<UserListDto> GetAsync(long id)
     {
-        var student = await _context.Students.FindAsync(id);
+        var student = await _context.Users.FindAsync(id);
         if (student == null) throw new Exception("İlgili öğrenci bulunamadı");
-        return _mapper.Map<Student, StudentListDto>(student);
+        return _mapper.Map<User, UserListDto>(student);
     }
     
-    public async Task<StudentListDto> UpdateAsync(long id, StudentCreateUpdateDto dto)
+    public async Task<UserListDto> UpdateAsync(long id, UserCreateUpdateDto dto)
     {
-        var student = await _context.Students.FindAsync(id);
+        var student = await _context.Users.FindAsync(id);
         if (student == null) throw new Exception("İlgili öğrenci bulunamadı");
         _mapper.Map(dto, student);
         await _context.SaveChangesAsync();
-        return _mapper.Map<Student, StudentListDto>(student);
+        return _mapper.Map<User, UserListDto>(student);
     }
 
     public async Task<bool> DeleteAsync(long id)
     {
-        var student = await _context.Students.FindAsync(id);
+        var student = await _context.Users.FindAsync(id);
         if (student == null) return false;
-        _context.Students.Remove(student);
+        _context.Users.Remove(student);
         return await _context.SaveChangesAsync() > 0;
     }
 }
