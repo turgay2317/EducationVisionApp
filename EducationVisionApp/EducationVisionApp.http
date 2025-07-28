@@ -1,0 +1,6 @@
+@EducationVisionApp_HostAddress = http://localhost:5171
+
+GET {{EducationVisionApp_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
