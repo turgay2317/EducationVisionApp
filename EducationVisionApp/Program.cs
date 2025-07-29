@@ -1,13 +1,14 @@
-using System.Text;
 using AutoMapper;
 using EducationVisionApp.Bussines.Mapping;
 using EducationVisionApp.Bussines.Services;
 using EducationVisionApp.Bussines.Services.Abstract;
+using EducationVisionApp.Bussines.Services.Concrete;
 using EducationVisionApp.Data.Context;
 using EducationVisionApp.Domain;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -36,6 +37,8 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<IClassService, ClassService>();
+
 // Controllers
 builder.Services.AddControllers();
 // Swagger

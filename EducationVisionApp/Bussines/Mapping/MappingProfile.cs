@@ -1,4 +1,5 @@
 using AutoMapper;
+using EducationVisionApp.Application.DTOs.Class;
 using EducationVisionApp.Application.DTOs.Student;
 using EducationVisionApp.Domain.Entities;
 
@@ -10,5 +11,8 @@ public class MappingProfile : Profile
     {
         CreateMap<UserCreateUpdateDto, User>();
         CreateMap<User, UserListDto>();
+
+        CreateMap<ClassCreateUpdateDto, Class>();
+        CreateMap<Class, ClassListDto>();
     }
 }

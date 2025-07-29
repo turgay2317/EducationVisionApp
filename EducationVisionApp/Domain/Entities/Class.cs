@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace EducationVisionApp.Domain.Entities;
 
 public class Class
