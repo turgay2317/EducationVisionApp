@@ -18,7 +18,7 @@ public class ClassController : ControllerBase
     }
 
     [HttpGet]
-    public Task<List<ClassListDto>> GetAll()
+    public Task<List<ClassListWithStudentsDto>> GetAll()
     {
         return _classService.GetAllAsync();
     }

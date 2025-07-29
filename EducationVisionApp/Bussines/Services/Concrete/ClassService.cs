@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using EducationVisionApp.Application.DTOs.Class;
+using EducationVisionApp.Application.DTOs.Student;
 using EducationVisionApp.Bussines.Services.Abstract;
 using EducationVisionApp.Data.Context;
 using EducationVisionApp.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace EducationVisionApp.Bussines.Services.Concrete;
 
@@ -20,13 +20,28 @@ public class ClassService : IClassService
         this._authenticationService = authenticationService;
     }
 
-    public async Task<List<ClassListDto>> GetAllAsync()
+    public async Task<List<ClassListWithStudentsDto>> GetAllAsync()
     {
-        var classes = await _context.Classes
+        var classes = _context.Classes
             .Where(c => c.TeacherId == _authenticationService.GetCurrentUserId())
-            .ToListAsync();
-        // TO-DO: Düzelt
-        return null;
+            .ToList();
+
+        var classesAndStudents = classes.Select(c =>
+        {
+            var students = _context.UserClasses
+            .Where(uc => uc.ClassId == c.Id)
+            .Select(uc => uc.User)
+            .ToList();
+
+            return new ClassListWithStudentsDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Students = _mapper.Map<List<UserListDto>>(students)
+            };
+        }).ToList();
+
+        return classesAndStudents;
     }
 
     public async Task<ClassListDto> CreateAsync(ClassCreateUpdateDto dto)
