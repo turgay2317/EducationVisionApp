@@ -15,8 +15,8 @@ public class RecordController
     }
 
     [HttpPost]
-    public async Task<bool> Add(long id, [FromBody] RecordCreateDto dto)
+    public async Task<bool> Add([FromBody] RecordCreateDto dto)
     {
-        return await _recordService.AddAsync(id, dto);
+        return await _recordService.AddAsync(dto);
     }
 }

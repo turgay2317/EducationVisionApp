@@ -5,12 +5,11 @@ public class RecordCreateDto
     public class RecordSingleDto
     {
         public long UserClassId { get; set; }
-        public float Stress { get; set; }
-        public float Hyperactivity { get; set; }
-        public float Sadness { get; set; }
-        public float Adhd { get; set; }
+        public float Distracted { get; set; }
+        public float Focused { get; set; }
+        public float Sleepy { get; set; }
     }
-
+    public long Id { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
 

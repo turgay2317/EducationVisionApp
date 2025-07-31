@@ -6,4 +6,7 @@ public class Class
     public string Name { get; set; }
     public long TeacherId { get; set; }
     public User Teacher { get; set; }
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
+    public bool IsFinished { get; set; }
 }

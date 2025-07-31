@@ -11,8 +11,7 @@ public class Record
     /// <summary>
     /// Duygudurum belirteçleri
     /// </summary>
-    public float Stress { get; set; }
-    public float Hyperactivity { get; set; }
-    public float Sadness { get; set; }
-    public float Adhd { get; set; }
+    public float Distracted { get; set; }
+    public float Focused { get; set; }
+    public float Sleepy { get; set; }
 }

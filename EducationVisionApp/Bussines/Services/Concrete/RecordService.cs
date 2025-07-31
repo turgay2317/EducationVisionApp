@@ -14,23 +14,33 @@ public class RecordService : IRecordService
         _context = context;
     }
 
-    public async Task<bool> AddAsync(long id, RecordCreateDto dto)
+    public async Task<bool> AddAsync(RecordCreateDto dto)
     {
+        var now = DateTime.Now;
+        var isClassOnGoing = _context.Classes.Any(c =>
+            c.Id == dto.Id &&
+            c.StartTime <= now &&
+            c.EndTime >= now &&
+            !c.IsFinished
+        );
+
+        if (!isClassOnGoing)
+            throw new Exception("İlgili ders devam etmediği için veri eklenemez.");
+
         var userClassRecords = dto.Records.Select(r =>
         {
             var createRecord = _context.Records.Add(new Record
             {
                 StartDate = dto.StartDate,
                 EndDate = dto.EndDate,
-                Adhd = r.Adhd,
-                Hyperactivity = r.Hyperactivity,
-                Sadness = r.Sadness,
-                Stress = r.Stress,
+                Distracted = r.Distracted,
+                Focused = r.Focused,
+                Sleepy = r.Sleepy,
             });
 
             return new UserClassRecord
             {
-                UserClassId = id,
+                UserClassId = r.UserClassId,
                 Record = createRecord.Entity
             };
         });
