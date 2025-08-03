@@ -29,6 +29,13 @@ public class ClassService : IClassService
             .Include(x => x.Lessons)
             .ToListAsync();
 
+        foreach (var cls in classes)
+        {
+            cls.Lessons = cls.Lessons
+                .OrderByDescending(l => l.EndTime) 
+                .ToList();
+        }
+        
         var classesAndStudents = classes.Select(c =>
         {
             var students = c.Students.ToList();

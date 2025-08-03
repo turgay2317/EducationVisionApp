@@ -57,7 +57,7 @@ namespace EducationVisionApp.Bussines.Services.Jobs
             }
             
             var prompt =
-                $"Bir ders sırasında odak durumu, uykusuzluk ve dikkat dağınıklığı olarak üç parametremiz var. Bu parametreler [0,1] aralığında. Sana bir sınıftaki insanların göndereceğim bu üç parmaetrelerinin ortalama verisinden sınıf hakkında yazılı bir analizde bulun max. 150 kelime olsun. Sakın sayısal bir değerden bahsetme sadece yazılı yorumunu yap. Eğer sana geçmiş dersin verisini gönderdiysem onunla da karşılaştırma yapabilirsin." +
+                $"Bir ders sırasında odak durumu, uykusuzluk ve dikkat dağınıklığı olarak üç parametremiz var. Bu parametreler [0,1] aralığında. Sana bir sınıftaki insanların göndereceğim bu üç parmaetrelerinin ortalama verisinden sınıf hakkında yazılı bir analizde bulun max. 80-90 kelime olsun. Sakın sayısal bir değerden bahsetme sadece yazılı yorumunu yap. Eğer sana geçmiş dersin verisini gönderdiysem onunla da karşılaştırma yapabilirsin." +
                 $"Ort. Dikkat dağınıklığı: {userRecords.Average(x => x.AvgDistracted)}" +
                 $"Ort. Odaklanma durumu {userRecords.Average(x => x.AvgFocused)}" +
                 $"Ort. Uykulu olma durumu {userRecords.Average(x => x.AvgSleepy)}";

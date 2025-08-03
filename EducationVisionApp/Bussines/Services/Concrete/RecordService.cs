@@ -108,7 +108,7 @@ public class RecordService : IRecordService
                         AvgSleepy = ul.Average(x => x.AvgSleepy) * 100,
                         Date = firstEntry?.Lesson.StartTime ?? DateTime.MinValue,
                         Comment = classLessions.Where(l => l.LessonId == firstEntry.LessonId).FirstOrDefault().Lesson.Comment,
-                        Students = l.Select(st => new StudentRecordAverageDto.StudentAverageDto()
+                        Students = h.Select(st => new StudentRecordAverageDto.StudentAverageDto()
                         {
                             AvgDistracted = (float)Math.Round(st.AvgDistracted * 100,2),
                             AvgFocused = (float)Math.Round(st.AvgFocused * 100, 2),
@@ -121,4 +121,38 @@ public class RecordService : IRecordService
         });
         return res.FirstOrDefault();
     }
+
+    public List<ClassLessonDto> GetAll()
+    {
+        var results = _context.Classes
+            .Include(c => c.Lessons)
+            .ThenInclude(l => l.Teacher)
+            .Select(c => new ClassLessonDto
+            {
+                ClassName = c.Name,
+                Lessons = c.Lessons
+                    .OrderByDescending(l => l.EndTime)
+                    .Select(lesson => new LessonDto
+                    {
+                        LessonName = lesson.Name,
+                        EndDate = lesson.EndTime,
+                        StartDate = lesson.StartTime,
+                        IsFinished = lesson.IsFinished,
+                        TeacherName = lesson.Teacher.Name,
+                        AvgFocused = _context.UserLessons
+                            .Where(ul => ul.LessonId == lesson.Id)
+                            .Average(ul => (float?)ul.AvgFocused) ?? 0,
+                        AvgDistracted = _context.UserLessons
+                            .Where(ul => ul.LessonId == lesson.Id)
+                            .Average(ul => (float?)ul.AvgDistracted) ?? 0,
+                        AvgSleepy = _context.UserLessons
+                            .Where(ul => ul.LessonId == lesson.Id)
+                            .Average(ul => (float?)ul.AvgSleepy) ?? 0
+                    }).ToList()
+            })
+            .ToList();
+
+        return results;
+    }
+
 }

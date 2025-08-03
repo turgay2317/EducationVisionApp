@@ -1,5 +1,6 @@
 ﻿using EducationVisionApp.Application.DTOs.Record;
 using EducationVisionApp.Bussines.Services.Abstract;
+using EducationVisionApp.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EducationVisionApp.Application.Controllers;
@@ -24,5 +25,11 @@ public class RecordController
     public StudentRecordAverageDto Details(long lessonId)
     {
         return _recordService.GetAverageRecordsOfStudentsByLesson(lessonId);
+    }
+    
+    [HttpGet]
+    public List<ClassLessonDto> AllClassesAndLessons()
+    {
+        return _recordService.GetAll();
     }
 }
