@@ -33,12 +33,12 @@ public class AuthenticationService : IAuthenticationService
         return _context.Users.FirstOrDefault(t => t.Id.ToString() == teacherId);
     }
 
-    public async Task<string> Authenticate(AuthDto authDto)
+    public async Task<AuthTokenDto> Authenticate(AuthDto authDto)
     {
         var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == authDto.Email && x.Password == authDto.Password);
         if (user == null)
             throw new UnauthorizedAccessException("E-posta ya da şifre yanlılş");
 
-        return _jwtTokenService.GenerateToken(user.Id);
+        return new AuthTokenDto() { Token = _jwtTokenService.GenerateToken(user.Id) };
     }
 }

@@ -19,7 +19,7 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<string> Login([FromBody] AuthDto authDto)
+    public async Task<AuthTokenDto> Login([FromBody] AuthDto authDto)
     {
         return await _authenticationService.Authenticate(authDto);
     }
