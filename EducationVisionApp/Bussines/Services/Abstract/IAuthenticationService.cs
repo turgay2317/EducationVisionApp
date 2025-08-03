@@ -5,7 +5,7 @@ namespace EducationVisionApp.Bussines.Services.Abstract;
 
 public interface IAuthenticationService
 {
-    public Task<string> Authenticate(AuthDto authDto);
+    public Task<AuthTokenDto> Authenticate(AuthDto authDto);
     public long? GetCurrentUserId();
     public User? GetCurrentUser();
 }

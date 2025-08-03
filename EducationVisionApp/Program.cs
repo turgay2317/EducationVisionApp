@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using EducationVisionApp.Data;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -50,6 +52,29 @@ builder.Services.AddScoped<IRecordService, RecordService>();
 // Jobs
 builder.Services.AddHangfire(config => config.UseMemoryStorage());
 builder.Services.AddHangfireServer();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyMethod() 
+            .AllowAnyHeader(); 
+    });
+});
+
+builder.Services.Configure<GeminiOptions>(builder.Configuration.GetSection("Gemini"));
+
+builder.Services.AddTransient<GeminiDelegatingHandler>();
+
+builder.Services.AddHttpClient<GeminiClient>(
+        (serviceProvider, httpClient) =>
+        {
+            var geminiOptions = serviceProvider.GetRequiredService<IOptions<GeminiOptions>>().Value;
+
+            httpClient.BaseAddress = new Uri(geminiOptions.Url);
+        })
+    .AddHttpMessageHandler<GeminiDelegatingHandler>();
 
 // Controllers
 builder.Services.AddControllers();
@@ -66,7 +91,7 @@ using (var scope = app.Services.CreateScope())
 
     jobManager.AddOrUpdate(
         "check-finished-class-job",
-        () => job.CheckForFinishedClass(),
+        () => job.CheckForFinishedLesson(),
         Cron.Minutely);
 }
 
@@ -76,7 +101,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

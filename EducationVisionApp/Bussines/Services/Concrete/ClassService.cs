@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using EducationVisionApp.Application.DTOs.Class;
+using EducationVisionApp.Application.DTOs.Lesson;
 using EducationVisionApp.Application.DTOs.Student;
 using EducationVisionApp.Bussines.Services.Abstract;
 using EducationVisionApp.Data.Context;
 using EducationVisionApp.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace EducationVisionApp.Bussines.Services.Concrete;
 
@@ -22,22 +24,21 @@ public class ClassService : IClassService
 
     public async Task<List<ClassListWithStudentsDto>> GetAllAsync()
     {
-        var classes = _context.Classes
-            .Where(c => c.TeacherId == _authenticationService.GetCurrentUserId())
-            .ToList();
+        var classes = await _context.Classes
+            .Include(x => x.Students)
+            .Include(x => x.Lessons)
+            .ToListAsync();
 
         var classesAndStudents = classes.Select(c =>
         {
-            var students = _context.UserClasses
-            .Where(uc => uc.ClassId == c.Id)
-            .Select(uc => uc.User)
-            .ToList();
+            var students = c.Students.ToList();
 
             return new ClassListWithStudentsDto
             {
                 Id = c.Id,
                 Name = c.Name,
-                Students = _mapper.Map<List<UserListDto>>(students)
+                Students = _mapper.Map<List<UserListDto>>(students),
+                Lessons = _mapper.Map<List<LessonListDto>>(c.Lessons)
             };
         }).ToList();
 
@@ -47,7 +48,6 @@ public class ClassService : IClassService
     public async Task<ClassListDto> CreateAsync(ClassCreateUpdateDto dto)
     {
         var entity = _mapper.Map<Class>(dto);
-        entity.TeacherId = _authenticationService.GetCurrentUser().Id;
         await _context.Classes.AddAsync(entity);
         await _context.SaveChangesAsync();
         return _mapper.Map<ClassListDto>(entity);
@@ -72,11 +72,12 @@ public class ClassService : IClassService
 
     public async Task<ClassListDto> AddStudentAsync(long id, ClassAddStudentDto dto)
     {
-        var entity = await _context.Classes.FindAsync(id);
+        var entity = await _context.Classes
+            .Where(x => x.Id == id)
+            .Include(x => x.Students)
+            .FirstOrDefaultAsync();
         if (entity == null) throw new Exception("İlgili sınıf bulunamadı");
-        await _context.UserClasses.AddRangeAsync(
-            dto.StudentIds.Select(studentId => new UserClass { ClassId = id, UserId = studentId }
-        ));
+        entity.Students.AddRange(_mapper.Map<List<User>>(dto.Students));
         await _context.SaveChangesAsync();
         return _mapper.Map<ClassListDto>(entity);
     }

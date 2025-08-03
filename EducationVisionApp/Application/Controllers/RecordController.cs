@@ -19,4 +19,10 @@ public class RecordController
     {
         return await _recordService.AddAsync(dto);
     }
+    
+    [HttpGet("{lessonId}")]
+    public StudentRecordAverageDto Details(long lessonId)
+    {
+        return _recordService.GetAverageRecordsOfStudentsByLesson(lessonId);
+    }
 }

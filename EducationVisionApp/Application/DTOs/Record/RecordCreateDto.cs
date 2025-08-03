@@ -4,12 +4,12 @@ public class RecordCreateDto
 {
     public class RecordSingleDto
     {
-        public long UserClassId { get; set; }
+        public long UserId { get; set; }
         public float Distracted { get; set; }
         public float Focused { get; set; }
         public float Sleepy { get; set; }
     }
-    public long Id { get; set; }
+    public long LessonId { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
 

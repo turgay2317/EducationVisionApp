@@ -3,6 +3,9 @@ namespace EducationVisionApp.Domain.Entities;
 public class Record
 {
     public long Id { get; set; }
+    public long LessonId { get; set; }
+    public long UserId { get; set; }
+
     /// <summary>
     /// Kayıt tarih aralıkları
     /// </summary>
