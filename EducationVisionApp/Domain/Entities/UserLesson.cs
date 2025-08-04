@@ -11,4 +11,8 @@ public class UserLesson
     public float AvgFocused { get; set; }
     public float AvgSleepy { get; set; }
     public List<Record> Records { get; set; }
+    public int TotalBlinkCount { get; set; }
+    public int AvgConfidence { get; set; }
+    public int TotalHeadTurn  { get; set; }
+    public bool IsProcessed { get; set; }
 }

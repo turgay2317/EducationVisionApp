@@ -12,5 +12,6 @@ public class Lesson
     public bool IsFinished { get; set; }
     public List<Record> Records { get; set; }
     public string Comment { get; set; }
+    public string CommentForNextTeacher { get; set; }
 
 }

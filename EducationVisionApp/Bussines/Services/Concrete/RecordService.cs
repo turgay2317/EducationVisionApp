@@ -38,6 +38,9 @@ public class RecordService : IRecordService
             Distracted = r.Distracted,
             Focused = r.Focused,
             Sleepy = r.Sleepy,
+            BlinkCount = r.BlinkCount,
+            HeadTurn = r.HeadTurn,
+            Confidence = r.Confidence
         });
         
         await _context.Records.AddRangeAsync(insertingRecords);

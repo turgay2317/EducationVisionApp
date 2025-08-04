@@ -1,4 +1,5 @@
 using System.Text;
+using EducationVisionApp.Domain.Entities;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -106,4 +107,26 @@ public sealed class GeminiClient
 
         return geminiResponseText;
     }
+    
+    public async Task<List<UserLesson>> GetProcessedLessonDatas(string prompt, CancellationToken cancellationToken)
+    {
+        var requestBody = GeminiRequestFactory.CreateRequest(prompt);
+        var content = new StringContent(JsonConvert.SerializeObject(requestBody, Formatting.None, _serializerSettings), Encoding.UTF8, "application/json");
+            
+        var response = await _httpClient.PostAsync("", content, cancellationToken);
+
+        response.EnsureSuccessStatusCode();
+
+        var responseBody = await response.Content.ReadAsStringAsync();
+        var geminiResponse = JsonConvert.DeserializeObject<GeminiResponse>(responseBody);
+
+        var geminiResponseText = geminiResponse?.Candidates[0].Content.Parts[0].Text
+            .Replace("```json", "")
+            .Replace("```", "");
+       var objects = JsonConvert.DeserializeObject<List<UserLesson>>(geminiResponseText)
+               ?? new List<UserLesson>();
+
+       return objects;
+    }
+
 }
