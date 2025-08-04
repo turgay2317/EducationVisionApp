@@ -17,5 +17,7 @@ public class MappingProfile : Profile
         CreateMap<Class, ClassListDto>();
         CreateMap<Lesson, LessonListDto>();
 
+        CreateMap<Lesson, CreateLessonDto>().ReverseMap();
+
     }
 }

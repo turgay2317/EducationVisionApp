@@ -31,7 +31,7 @@ public class RecordService : IRecordService
 
         var insertingRecords = dto.Records.Select(r => new Record
         {
-            UserId = r.UserId,
+            StudentId = r.UserId,
             LessonId = dto.LessonId,
             StartDate = dto.StartDate,
             EndDate = dto.EndDate,

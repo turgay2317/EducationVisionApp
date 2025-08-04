@@ -48,6 +48,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IClassService, ClassService>();
 builder.Services.AddScoped<IRecordService, RecordService>();
+builder.Services.AddScoped<ILessonService, LessonService>();
 
 // Jobs
 builder.Services.AddHangfire(config => config.UseMemoryStorage());

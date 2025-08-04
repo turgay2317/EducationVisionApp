@@ -36,7 +36,7 @@ namespace EducationVisionApp.Bussines.Services.Jobs
             lastFinishedLesson.IsFinished = true;
             var userIds = _context.Records
                 .Where(x => x.LessonId == lastFinishedLesson.Id)
-                .Select(x => x.UserId)
+                .Select(x => x.StudentId)
                 .Distinct()
                 .ToList();
 
@@ -44,12 +44,12 @@ namespace EducationVisionApp.Bussines.Services.Jobs
             foreach (var uid in userIds)
             {
                 var records = _context.Records
-                    .Where(x => x.UserId == uid && x.LessonId == lastFinishedLesson.Id)
+                    .Where(x => x.StudentId == uid && x.LessonId == lastFinishedLesson.Id)
                     .ToList();
 
                 var ul = new UserLesson()
                 {
-                    UserId = uid,
+                    StudentId = uid,
                     LessonId = lastFinishedLesson.Id,
                     AvgDistracted = records.Average(x => x.Distracted),
                     AvgFocused = records.Average(x => x.Focused),
@@ -94,7 +94,7 @@ namespace EducationVisionApp.Bussines.Services.Jobs
             {
                 var prevlessonRecords = _context.Records
                     .Where(x => x.LessonId == previousLesson.Id)
-                    .GroupBy(x => x.UserId)
+                    .GroupBy(x => x.StudentId)
                     .ToList();
 
                 foreach (var record in prevlessonRecords)
@@ -102,7 +102,7 @@ namespace EducationVisionApp.Bussines.Services.Jobs
                     var records = record.ToList();
                     var ul = new UserLesson()
                     {
-                        UserId = record.Key,
+                        StudentId = record.Key,
                         LessonId = previousLesson.Id,
                         AvgDistracted = records.Average(x => x.Distracted),
                         AvgFocused = records.Average(x => x.Focused),

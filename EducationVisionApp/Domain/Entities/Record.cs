@@ -4,7 +4,7 @@ public class Record
 {
     public long Id { get; set; }
     public long LessonId { get; set; }
-    public long UserId { get; set; }
+    public long StudentId { get; set; }
 
     /// <summary>
     /// Kayıt tarih aralıkları

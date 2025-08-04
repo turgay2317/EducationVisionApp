@@ -39,6 +39,6 @@ public class AuthenticationService : IAuthenticationService
         if (user == null)
             throw new UnauthorizedAccessException("E-posta ya da şifre yanlılş");
 
-        return new AuthTokenDto() { Token = _jwtTokenService.GenerateToken(user.Id) };
+        return new AuthTokenDto() { Token = _jwtTokenService.GenerateToken(user.Id), Type = user.Type};
     }
 }
