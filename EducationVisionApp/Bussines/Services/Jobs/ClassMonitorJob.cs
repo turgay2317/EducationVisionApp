@@ -1,9 +1,11 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using EducationVisionApp.Bussines.Services.Abstract;
 using EducationVisionApp.Data;
 using EducationVisionApp.Data.Context;
 using EducationVisionApp.Domain.Entities;
 using EducationVisionApp.Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace EducationVisionApp.Bussines.Services.Jobs
 {
@@ -110,10 +112,12 @@ namespace EducationVisionApp.Bussines.Services.Jobs
                     $"Sana bu öğrencinin belli zaman aralıklarında ölçülmüş verilerini göndereceğim " +
                     $"bu üç parametre verisinden kişi hakkında yazılı bir analizde bulun. " +
                     $"Sakın sayısal bir değerden bahsetme sadece yazılı yorumunu yap. " +
-                    $"Eğer sana geçmiş dersin verisini gönderdiysem onunla da karşılaştırma yapabilirsin. " +
+                    $"Eğer sana geçmiş sınav verisini gönderdiysem onunla da karşılaştırma yapabilirsin. " +
                     $"Ayrıca kaçıncı dakikalar arasında dikkatinin dağıldığını kaçıncı dakikalar arasında dikkatini topladığını, " +
-                    $"çok kafa çevirdiği anları da belirtebilirsin." +
-                    $"Bu kişinin bir dersteki kayıtları şöyledir; {serializedJson}";
+                    $"çok kafa çevirdiği anları da belirtebilirsin. Sana gönderdiğim veride bir sürü id olabilir." +
+                    $"Bu idlerin tamamı tek bir öğrenciye ait. Kısacası analizini yaparken tüm verilerin tek ogrenciye ait" +
+                    $"oldugunu unutma" +
+                    $"Bu kişinin bir sınav esnasındaki kayıtları şöyledir; {serializedJson}";
             }
 
             var pastUserRecords = new List<UserLesson>();
@@ -155,14 +159,50 @@ namespace EducationVisionApp.Bussines.Services.Jobs
             await _context.SaveChangesAsync();
 
             var nextLesson = _context.Lessons
+                .Include(c => c.Teacher)
                 .Where(c => !c.IsFinished && c.StartTime >= lastFinishedLesson.EndTime)
                 .OrderBy(c => c.StartTime)
                 .FirstOrDefault();
 
             if (nextLesson != null)
             {
-                // İşlemler...
-                Console.WriteLine(nextLesson.Name);
+                var url = "http://localhost:5678/webhook-test/teacher_notification";
+
+                // Nesne oluşturuluyor
+                var payload = new
+                {
+                    teacher = new
+                    {
+                        name = nextLesson.Teacher.Name,
+                        email = nextLesson.Teacher.Email
+                    },
+                    classMetrics = new
+                    {
+                        attention = userRecords.Average(x => x.AvgFocused),
+                        sleepy = userRecords.Average(x => x.AvgSleepy),
+                        distraction = userRecords.Average(x => x.AvgDistracted)
+                    }
+                };
+                var json = JsonSerializer.Serialize(payload);
+
+                using (var client = new HttpClient())
+                {
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                    try
+                    {
+                        var response = await client.PostAsync(url, content);
+
+                        string responseContent = await response.Content.ReadAsStringAsync();
+
+                        Console.WriteLine($"Status: {response.StatusCode}");
+                        Console.WriteLine($"Response: {responseContent}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Hata oluştu: {ex.Message}");
+                    }
+                }
             }
         }
     }

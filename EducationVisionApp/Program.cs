@@ -93,7 +93,8 @@ using (var scope = app.Services.CreateScope())
     jobManager.AddOrUpdate(
         "check-finished-class-job",
         () => job.CheckForFinishedLesson(),
-        Cron.Minutely);
+        "*/15 * * * * *"
+        );
 }
 
 // Configure the HTTP request pipeline.
