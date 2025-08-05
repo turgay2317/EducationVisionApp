@@ -10,6 +10,9 @@ public class LessonDto
     public float AvgDistracted { get; set; }
     public float AvgSleepy { get; set; }
     public float AvgFocused { get; set; }
+    public int TotalHeadTurn { get; set; } = 0;
+    public int TotalBlink { get; set; } = 0;
+    public string Comment { get; set; } = string.Empty;
 }
 
 public class ClassLessonDto

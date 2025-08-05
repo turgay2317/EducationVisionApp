@@ -9,10 +9,12 @@ namespace EducationVisionApp.Bussines.Services.Concrete;
 public class RecordService : IRecordService
 {
     private readonly EducationDbContext _context;
+    private readonly IAuthenticationService _authenticationService;
 
-    public RecordService(EducationDbContext context)
+    public RecordService(EducationDbContext context, IAuthenticationService authenticationService)
     {
         _context = context;
+        _authenticationService = authenticationService;
     }
 
     public async Task<bool> AddAsync(RecordCreateDto dto)
@@ -151,6 +153,53 @@ public class RecordService : IRecordService
                         AvgSleepy = _context.UserLessons
                             .Where(ul => ul.LessonId == lesson.Id)
                             .Average(ul => (float?)ul.AvgSleepy) ?? 0
+                    }).ToList()
+            })
+            .ToList();
+
+        return results;
+    }
+    
+    public List<ClassLessonDto> GetMine()
+    {
+        var myLessonIds = _context.UserLessons
+            .Where(x => x.StudentId == _authenticationService.GetCurrentUserId())
+            .Select(ul => ul.LessonId)
+            .ToList();
+        
+        var results = _context.Classes
+            .Where(c => c.Lessons.Any(l => myLessonIds.Contains(l.Id)))
+            .Include(c => c.Lessons)
+            .Select(c => new ClassLessonDto
+            {
+                ClassName = c.Name,
+                Lessons = c.Lessons
+                    .Where(x => myLessonIds.Contains(x.Id))
+                    .OrderByDescending(l => l.EndTime)
+                    .Select(lesson => new LessonDto
+                    {
+                        LessonName = lesson.Name,
+                        EndDate = lesson.EndTime,
+                        StartDate = lesson.StartTime,
+                        IsFinished = lesson.IsFinished,
+                        TeacherName = lesson.Teacher.Name,
+                        AvgFocused = _context.UserLessons
+                            .Where(ul => ul.LessonId == lesson.Id)
+                            .Average(ul => (float?)ul.AvgFocused) ?? 0,
+                        AvgDistracted = _context.UserLessons
+                            .Where(ul => ul.LessonId == lesson.Id)
+                            .Average(ul => (float?)ul.AvgDistracted) ?? 0,
+                        AvgSleepy = _context.UserLessons
+                            .Where(ul => ul.LessonId == lesson.Id)
+                            .Average(ul => (float?)ul.AvgSleepy) ?? 0,
+                        TotalBlink = _context.UserLessons
+                            .Where(ul => ul.LessonId == lesson.Id)
+                            .Sum(ul =>  ul.TotalBlinkCount),
+                        TotalHeadTurn = _context.UserLessons
+                            .Where(ul => ul.LessonId == lesson.Id)
+                            .Sum(ul =>  ul.TotalHeadTurn),
+                        Comment = lesson.Comment
+                        
                     }).ToList()
             })
             .ToList();

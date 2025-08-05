@@ -8,4 +8,5 @@ public interface IRecordService
     public Task<bool> AddAsync(RecordCreateDto dto);
     public StudentRecordAverageDto GetAverageRecordsOfStudentsByLesson(long lessonId);
     public List<ClassLessonDto> GetAll();
+    public List<ClassLessonDto> GetMine();
 }

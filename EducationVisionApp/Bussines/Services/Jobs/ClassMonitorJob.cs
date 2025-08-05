@@ -1,7 +1,9 @@
 ﻿using System.Text.Json;
+using EducationVisionApp.Bussines.Services.Abstract;
 using EducationVisionApp.Data;
 using EducationVisionApp.Data.Context;
 using EducationVisionApp.Domain.Entities;
+using EducationVisionApp.Domain.Enums;
 
 namespace EducationVisionApp.Bussines.Services.Jobs
 {
@@ -28,7 +30,7 @@ namespace EducationVisionApp.Bussines.Services.Jobs
             if (lastFinishedLesson == null) return;
             
             var previousLesson = _context.Lessons
-                .Where(c => c.ClassId == lastFinishedLesson.ClassId && c.Id != lastFinishedLesson.Id && c.EndTime <= lastFinishedLesson.StartTime)
+                .Where(c => c.ClassId == lastFinishedLesson.ClassId && c.Id != lastFinishedLesson.Id && c.EndTime <= lastFinishedLesson.StartTime && c.Type == lastFinishedLesson.Type)
                 .OrderByDescending(c => c.EndTime)
                 .FirstOrDefault();
             
@@ -82,12 +84,38 @@ namespace EducationVisionApp.Bussines.Services.Jobs
             
             _context.UserLessons.UpdateRange(processedRecords);
             
-            var prompt =
-                $"Bir ders sırasında odak durumu, uykusuzluk ve dikkat dağınıklığı olarak üç parametremiz var. Bu parametreler [0,1] aralığında. Sana bir sınıftaki insanların göndereceğim bu üç parmaetrelerinin ortalama verisinden sınıf hakkında yazılı bir analizde bulun max. 80-90 kelime olsun. Sakın sayısal bir değerden bahsetme sadece yazılı yorumunu yap. Eğer sana geçmiş dersin verisini gönderdiysem onunla da karşılaştırma yapabilirsin." +
-                $"Ort. Dikkat dağınıklığı: {userRecords.Average(x => x.AvgDistracted)}" +
-                $"Ort. Odaklanma durumu {userRecords.Average(x => x.AvgFocused)}" +
-                $"Ort. Uykulu olma durumu {userRecords.Average(x => x.AvgSleepy)}";
-            
+            string prompt;
+
+            if (lastFinishedLesson.Type == LessonType.Class)
+            {
+                prompt = $"Bir ders sırasında odak durumu, uykusuzluk ve dikkat dağınıklığı olarak üç parametremiz var. " +
+                         $"Bu parametreler [0,1] aralığında. Sana bir sınıftaki insanların göndereceğim bu üç parmaetrelerinin" +
+                         $" ortalama verisinden sınıf hakkında yazılı bir analizde bulun max. 80-90 kelime olsun. Sakın sayısal " +
+                         $"bir değerden bahsetme sadece yazılı yorumunu yap. Eğer sana geçmiş dersin verisini gönderdiysem onunla da " +
+                         $"karşılaştırma yapabilirsin." +
+                    $"Ort. Dikkat dağınıklığı: {userRecords.Average(x => x.AvgDistracted)}" +
+                    $"Ort. Odaklanma durumu {userRecords.Average(x => x.AvgFocused)}" +
+                    $"Ort. Uykulu olma durumu {userRecords.Average(x => x.AvgSleepy)}";
+            }
+            else
+            {
+                var myRecords = _context.Records
+                    .Where(x => x.LessonId == lastFinishedLesson.Id)
+                    .ToList();
+                
+                var serializedJson = JsonSerializer.Serialize(myRecords);
+                prompt =
+                    $"Bir kişi kendini kameraya kaydedip sınav/deneme çözme sırasında odak durumu, uykusuzluk ve dikkat dağınıklığı ölçmek istiyor. " +
+                    $"Bunun için üç parametremiz var. Bu parametreler [0,1] aralığında. " +
+                    $"Sana bu öğrencinin belli zaman aralıklarında ölçülmüş verilerini göndereceğim " +
+                    $"bu üç parametre verisinden kişi hakkında yazılı bir analizde bulun. " +
+                    $"Sakın sayısal bir değerden bahsetme sadece yazılı yorumunu yap. " +
+                    $"Eğer sana geçmiş dersin verisini gönderdiysem onunla da karşılaştırma yapabilirsin. " +
+                    $"Ayrıca kaçıncı dakikalar arasında dikkatinin dağıldığını kaçıncı dakikalar arasında dikkatini topladığını, " +
+                    $"çok kafa çevirdiği anları da belirtebilirsin." +
+                    $"Bu kişinin bir dersteki kayıtları şöyledir; {serializedJson}";
+            }
+
             var pastUserRecords = new List<UserLesson>();
 
             if (previousLesson != null)

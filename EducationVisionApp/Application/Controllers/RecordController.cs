@@ -32,4 +32,10 @@ public class RecordController
     {
         return _recordService.GetAll();
     }
+    
+    [HttpGet("My")]
+    public List<ClassLessonDto> GetMyLessons()
+    {
+        return _recordService.GetMine();
+    }
 }

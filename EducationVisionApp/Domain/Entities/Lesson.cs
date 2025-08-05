@@ -1,3 +1,5 @@
+using EducationVisionApp.Domain.Enums;
+
 namespace EducationVisionApp.Domain.Entities;
 
 public class Lesson
@@ -11,7 +13,8 @@ public class Lesson
     public DateTime EndTime { get; set; }
     public bool IsFinished { get; set; }
     public List<Record> Records { get; set; }
-    public string Comment { get; set; }
-    public string CommentForNextTeacher { get; set; }
+    public string? Comment { get; set; }
+    public string? CommentForNextTeacher { get; set; }
+    public LessonType Type { get; set; }
 
 }

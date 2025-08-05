@@ -20,8 +20,6 @@ public class LessonService : ILessonService
     public async Task<LessonListDto> CreateLesson(CreateLessonDto dto)
     {
         var entity = _mapper.Map<Lesson>(dto);
-        entity.Comment = "";
-        entity.CommentForNextTeacher = "";
         _context.Lessons.Add(entity);
         await _context.SaveChangesAsync();
         return _mapper.Map<LessonListDto>(entity);
