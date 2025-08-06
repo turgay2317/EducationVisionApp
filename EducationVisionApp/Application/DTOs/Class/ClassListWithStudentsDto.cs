@@ -4,5 +4,5 @@ namespace EducationVisionApp.Application.DTOs.Class;
 
 public class ClassListWithStudentsDto : ClassListDto
 {
-    public List<UserListDto> Students { get; set; }
+    public int studentCount { get; set; } = 0;
 }

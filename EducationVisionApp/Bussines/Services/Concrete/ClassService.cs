@@ -38,13 +38,21 @@ public class ClassService : IClassService
         
         var classesAndStudents = classes.Select(c =>
         {
-            var students = c.Students.ToList();
+            var lessonIds = _context.Lessons
+                .Where(x => x.ClassId == c.Id)
+                .Select(x => x.Id)
+                .ToList();
+
+            var studentCount = _context.UserLessons
+                .Where(x => lessonIds.Contains(x.LessonId))
+                .Distinct()
+                .Count();
 
             return new ClassListWithStudentsDto
             {
                 Id = c.Id,
                 Name = c.Name,
-                Students = _mapper.Map<List<UserListDto>>(students),
+                studentCount = studentCount / c.Lessons.Count(),
                 Lessons = _mapper.Map<List<LessonListDto>>(c.Lessons)
             };
         }).ToList();
